@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status, update } = useSession();
@@ -48,6 +48,77 @@ export default function LoginPage() {
   };
 
   return (
+    <>
+      {registered && (
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md">
+          Account created successfully! Please sign in to continue.
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-linkedin-text-dark mb-1">
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="input"
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-linkedin-text-dark mb-1">
+            Password
+          </label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="input"
+            required
+          />
+        </div>
+
+        <button type="submit" className="btn-primary w-full py-3" disabled={isLoading}>
+          {isLoading ? "Signing in..." : "Sign in"}
+        </button>
+      </form>
+
+      <div className="mt-6 text-center">
+        <p className="text-linkedin-text-gray">
+          New to LinkedIn?{" "}
+          <Link href="/register" className="text-linkedin-blue font-semibold hover:underline">
+            Join now
+          </Link>
+        </p>
+      </div>
+    </>
+  );
+}
+
+function LoginFormFallback() {
+  return (
+    <div className="space-y-4">
+      <div className="h-16 bg-gray-100 rounded animate-pulse" />
+      <div className="h-16 bg-gray-100 rounded animate-pulse" />
+      <div className="h-12 bg-gray-100 rounded animate-pulse" />
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
     <main className="min-h-screen bg-white flex flex-col">
       <nav className="px-8 py-3">
         <Link href="/" className="flex items-center gap-2 w-fit">
@@ -66,61 +137,9 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           <h1 className="text-3xl font-semibold text-linkedin-text-dark mb-8">Sign in</h1>
-
-          {registered && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md">
-              Account created successfully! Please sign in to continue.
-            </div>
-          )}
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-linkedin-text-dark mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-linkedin-text-dark mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input"
-                required
-              />
-            </div>
-
-            <button type="submit" className="btn-primary w-full py-3" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-linkedin-text-gray">
-              New to LinkedIn?{" "}
-              <Link href="/register" className="text-linkedin-blue font-semibold hover:underline">
-                Join now
-              </Link>
-            </p>
-          </div>
+          <Suspense fallback={<LoginFormFallback />}>
+            <LoginForm />
+          </Suspense>
         </div>
       </div>
     </main>

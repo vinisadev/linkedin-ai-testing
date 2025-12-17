@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Loader2, Search, Users, Briefcase } from "lucide-react";
 import { UserCard } from "@/components/search/user-card";
@@ -14,7 +14,7 @@ interface SearchResults {
   nextCursor?: string;
 }
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const [activeTab, setActiveTab] = useState<SearchType>("people");
@@ -147,6 +147,32 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function SearchFallback() {
+  return (
+    <div className="space-y-4">
+      <div className="card p-4">
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+          <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+        </div>
+      </div>
+      <div className="card p-8">
+        <div className="flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-linkedin-blue" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<SearchFallback />}>
+      <SearchContent />
+    </Suspense>
   );
 }
 
