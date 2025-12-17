@@ -92,6 +92,10 @@ model User {
   // Notifications
   notifications    Notification[]
 
+  // Companies
+  companyMemberships CompanyMember[]
+  companyInvites     CompanyInvite[]
+
   @@index([email])
 }
 
@@ -381,6 +385,7 @@ enum NotificationType {
   POST_COMMENT
   JOB_APPLICATION
   MESSAGE
+  COMPANY_INVITE
 }
 
 model Notification {
@@ -398,4 +403,127 @@ model Notification {
   @@index([userId])
   @@index([read])
   @@index([createdAt])
+}
+
+// ============================================
+// COMPANIES
+// ============================================
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  logo        String?
+  banner      String?
+  headline    String?
+  description String?  @db.Text
+  website     String?
+  industry    String?
+  companySize String?
+  location    String?
+  foundedYear Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members CompanyMember[]
+  invites CompanyInvite[]
+  posts   CompanyPost[]
+
+  @@index([slug])
+  @@index([name])
+}
+
+enum CompanyRole {
+  OWNER
+  ADMIN
+  EDITOR
+}
+
+model CompanyMember {
+  id        String      @id @default(cuid())
+  companyId String
+  userId    String
+  role      CompanyRole @default(EDITOR)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, userId])
+  @@index([companyId])
+  @@index([userId])
+  @@index([role])
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model CompanyInvite {
+  id        String       @id @default(cuid())
+  companyId String
+  userId    String
+  role      CompanyRole  @default(EDITOR)
+  status    InviteStatus @default(PENDING)
+  invitedBy String
+  expiresAt DateTime
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, userId, status])
+  @@index([companyId])
+  @@index([userId])
+  @@index([status])
+}
+
+model CompanyPost {
+  id        String   @id @default(cuid())
+  companyId String
+  authorId  String
+  content   String   @db.Text
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company         Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  comments        CompanyPostComment[]
+  likes           CompanyPostLike[]
+
+  @@index([companyId])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model CompanyPostComment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post CompanyPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([authorId])
+}
+
+model CompanyPostLike {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post CompanyPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
 }
