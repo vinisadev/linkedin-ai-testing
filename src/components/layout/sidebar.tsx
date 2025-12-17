@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Building2 } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -73,6 +73,15 @@ export function Sidebar() {
           <span className="text-linkedin-blue font-semibold">
             {isLoading ? "-" : profile?.totalConnections || 0}
           </span>
+        </Link>
+      </div>
+      <div className="border-t border-linkedin-border-gray px-4 py-3">
+        <Link
+          href="/companies"
+          className="flex items-center gap-2 text-sm text-linkedin-text-gray hover:text-linkedin-text-dark"
+        >
+          <Building2 className="w-4 h-4" />
+          <span>Company pages</span>
         </Link>
       </div>
       <div className="border-t border-linkedin-border-gray px-4 py-3">
