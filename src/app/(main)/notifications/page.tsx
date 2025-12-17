@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Briefcase,
   MessageSquare,
+  Building2,
   Loader2,
   Check,
 } from "lucide-react";
@@ -22,7 +23,8 @@ type NotificationType =
   | "POST_LIKE"
   | "POST_COMMENT"
   | "JOB_APPLICATION"
-  | "MESSAGE";
+  | "MESSAGE"
+  | "COMPANY_INVITE";
 
 interface Notification {
   id: string;
@@ -41,6 +43,7 @@ const notificationIcons: Record<NotificationType, React.ElementType> = {
   POST_COMMENT: MessageCircle,
   JOB_APPLICATION: Briefcase,
   MESSAGE: MessageSquare,
+  COMPANY_INVITE: Building2,
 };
 
 const notificationColors: Record<NotificationType, string> = {
@@ -50,6 +53,7 @@ const notificationColors: Record<NotificationType, string> = {
   POST_COMMENT: "bg-orange-500",
   JOB_APPLICATION: "bg-purple-500",
   MESSAGE: "bg-linkedin-blue",
+  COMPANY_INVITE: "bg-teal-500",
 };
 
 export default function NotificationsPage() {

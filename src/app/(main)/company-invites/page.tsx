@@ -11,6 +11,7 @@ interface CompanyInvite {
   company: {
     id: string;
     name: string;
+    slug: string;
     logo: string | null;
     headline: string | null;
   };
@@ -54,8 +55,8 @@ export default function CompanyInvitesPage() {
         const data = await response.json();
         setInvites((prev) => prev.filter((i) => i.id !== inviteId));
 
-        if (action === "accept" && data.companyId) {
-          router.push(`/company/${data.companyId}`);
+        if (action === "accept" && data.companySlug) {
+          router.push(`/company/${data.companySlug}`);
         }
       }
     } catch (error) {

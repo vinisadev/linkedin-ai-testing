@@ -30,6 +30,7 @@ export async function POST(
           select: {
             id: true,
             name: true,
+            slug: true,
           },
         },
       },
@@ -110,7 +111,7 @@ export async function POST(
       return NextResponse.json({
         success: true,
         message: `You are now a member of ${invite.company.name}`,
-        companyId: invite.companyId,
+        companySlug: invite.company.slug,
       });
     } else {
       // Reject invite
