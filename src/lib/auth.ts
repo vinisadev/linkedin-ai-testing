@@ -13,7 +13,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
-    newUser: "/register",
+    newUser: "/onboarding",
   },
   providers: [
     CredentialsProvider({
@@ -49,6 +49,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           image: user.image,
+          onboardingComplete: user.onboardingComplete,
         };
       },
     }),
@@ -73,13 +74,27 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub!;
+        session.user.onboardingComplete = token.onboardingComplete as boolean;
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.sub = user.id;
+        token.onboardingComplete = user.onboardingComplete;
       }
+
+      // Refresh onboarding status on session update
+      if (trigger === "update") {
+        const dbUser = await db.user.findUnique({
+          where: { id: token.sub },
+          select: { onboardingComplete: true },
+        });
+        if (dbUser) {
+          token.onboardingComplete = dbUser.onboardingComplete;
+        }
+      }
+
       return token;
     },
   },

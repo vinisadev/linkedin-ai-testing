@@ -1,16 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session, status, update } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const registered = searchParams.get("registered");
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      if (session.user.onboardingComplete) {
+        router.push("/feed");
+      } else {
+        router.push("/onboarding");
+      }
+    }
+  }, [status, session, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +41,9 @@ export default function LoginPage() {
       setError("Invalid email or password");
       setIsLoading(false);
     } else {
-      router.push("/feed");
+      // Update session to get latest user data including onboardingComplete
+      await update();
+      // The useEffect above will handle the redirect
     }
   };
 
@@ -50,6 +66,12 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           <h1 className="text-3xl font-semibold text-linkedin-text-dark mb-8">Sign in</h1>
+
+          {registered && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md">
+              Account created successfully! Please sign in to continue.
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">

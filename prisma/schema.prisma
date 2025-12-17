@@ -54,18 +54,19 @@ model VerificationToken {
 // ============================================
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  password      String?
-  name          String?
-  image         String?
-  headline      String?
-  summary       String?   @db.Text
-  location      String?
-  website       String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  emailVerified      DateTime?
+  password           String?
+  name               String?
+  image              String?
+  headline           String?
+  summary            String?   @db.Text
+  location           String?
+  website            String?
+  onboardingComplete Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   accounts    Account[]
   sessions    Session[]
