@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -12,6 +12,28 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+  useEffect(() => {
+    if (session?.user) {
+      fetchUnreadCount();
+      // Poll for new notifications every 30 seconds
+      const interval = setInterval(fetchUnreadCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [session?.user]);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const response = await fetch("/api/notifications/unread-count");
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadNotifications(data.count);
+      }
+    } catch (error) {
+      console.error("Failed to fetch unread count:", error);
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +74,13 @@ export function Navbar() {
             <NavLink href="/network" icon={Users} label="My Network" active={pathname.startsWith("/network")} />
             <NavLink href="/jobs" icon={Briefcase} label="Jobs" active={pathname.startsWith("/jobs")} />
             <NavLink href="/messaging" icon={MessageSquare} label="Messaging" active={pathname.startsWith("/messaging")} />
-            <NavLink href="/notifications" icon={Bell} label="Notifications" active={pathname.startsWith("/notifications")} />
+            <NavLink
+              href="/notifications"
+              icon={Bell}
+              label="Notifications"
+              active={pathname.startsWith("/notifications")}
+              badge={unreadNotifications > 0 ? unreadNotifications : undefined}
+            />
 
             {session?.user && (
               <div className="relative group">
@@ -119,23 +147,32 @@ function NavLink({
   icon: Icon,
   label,
   active,
+  badge,
 }: {
   href: string;
   icon: React.ElementType;
   label: string;
   active?: boolean;
+  badge?: number;
 }) {
   return (
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center transition-colors",
+        "flex flex-col items-center transition-colors relative",
         active
           ? "text-linkedin-text-dark"
           : "text-linkedin-text-gray hover:text-linkedin-text-dark"
       )}
     >
-      <Icon className="w-6 h-6" />
+      <div className="relative">
+        <Icon className="w-6 h-6" />
+        {badge !== undefined && badge > 0 && (
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center px-1">
+            {badge > 99 ? "99+" : badge}
+          </span>
+        )}
+      </div>
       <span className="text-xs hidden md:block">{label}</span>
       {active && (
         <div className="hidden md:block absolute bottom-0 w-16 h-0.5 bg-linkedin-text-dark" />
