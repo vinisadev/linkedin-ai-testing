@@ -13,19 +13,24 @@ export function Navbar() {
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const [userImage, setUserImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (session?.user) {
-      fetchUnreadCount();
+      fetchUnreadNotifications();
+      fetchUnreadMessages();
       fetchUserImage();
-      // Poll for new notifications every 30 seconds
-      const interval = setInterval(fetchUnreadCount, 30000);
+      // Poll for new notifications and messages every 30 seconds
+      const interval = setInterval(() => {
+        fetchUnreadNotifications();
+        fetchUnreadMessages();
+      }, 30000);
       return () => clearInterval(interval);
     }
   }, [session?.user]);
 
-  const fetchUnreadCount = async () => {
+  const fetchUnreadNotifications = async () => {
     try {
       const response = await fetch("/api/notifications/unread-count");
       if (response.ok) {
@@ -33,7 +38,19 @@ export function Navbar() {
         setUnreadNotifications(data.count);
       }
     } catch (error) {
-      console.error("Failed to fetch unread count:", error);
+      console.error("Failed to fetch unread notifications:", error);
+    }
+  };
+
+  const fetchUnreadMessages = async () => {
+    try {
+      const response = await fetch("/api/conversations/unread-count");
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadMessages(data.count);
+      }
+    } catch (error) {
+      console.error("Failed to fetch unread messages:", error);
     }
   };
 
@@ -87,7 +104,13 @@ export function Navbar() {
             <NavLink href="/feed" icon={Home} label="Home" active={pathname === "/feed"} />
             <NavLink href="/network" icon={Users} label="My Network" active={pathname.startsWith("/network")} />
             <NavLink href="/jobs" icon={Briefcase} label="Jobs" active={pathname.startsWith("/jobs")} />
-            <NavLink href="/messaging" icon={MessageSquare} label="Messaging" active={pathname.startsWith("/messaging")} />
+            <NavLink
+              href="/messaging"
+              icon={MessageSquare}
+              label="Messaging"
+              active={pathname.startsWith("/messaging")}
+              badge={unreadMessages > 0 ? unreadMessages : undefined}
+            />
             <NavLink
               href="/notifications"
               icon={Bell}
