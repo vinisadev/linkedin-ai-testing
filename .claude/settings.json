@@ -1,0 +1,73 @@
+{
+  "$schema": "https://claude.ai/claude-code/settings.schema.json",
+  "model": "claude-sonnet-4-20250514",
+  "hooks": {
+    "pre-commit": {
+      "commands": [
+        {
+          "name": "typecheck",
+          "command": "npm run typecheck",
+          "description": "Run TypeScript type checking"
+        },
+        {
+          "name": "lint",
+          "command": "npm run lint",
+          "description": "Run ESLint"
+        },
+        {
+          "name": "format-check",
+          "command": "npm run format:check",
+          "description": "Check Prettier formatting"
+        }
+      ]
+    },
+    "pre-push": {
+      "commands": [
+        {
+          "name": "test",
+          "command": "npm run test -- --run",
+          "description": "Run test suite"
+        },
+        {
+          "name": "build",
+          "command": "npm run build",
+          "description": "Verify production build"
+        }
+      ]
+    }
+  },
+  "agents": {
+    "build": {
+      "file": ".claude/agents/build.md",
+      "model": "claude-sonnet-4-20250514",
+      "description": "Implementation agent for writing code"
+    },
+    "verify": {
+      "file": ".claude/agents/verify.md",
+      "model": "claude-haiku",
+      "description": "Testing and verification agent"
+    },
+    "deploy": {
+      "file": ".claude/agents/deploy.md",
+      "model": "claude-haiku",
+      "description": "DevOps and deployment agent"
+    }
+  },
+  "rules": [
+    ".claude/rules/code-style.md",
+    ".claude/rules/api-patterns.md",
+    ".claude/rules/testing.md",
+    ".claude/rules/git-workflow.md",
+    ".claude/rules/handoffs.md"
+  ],
+  "permissions": {
+    "allow_file_creation": true,
+    "allow_file_deletion": false,
+    "protected_paths": [
+      ".env",
+      ".env.local",
+      ".env.production",
+      "prisma/migrations/*"
+    ]
+  }
+}
