@@ -116,6 +116,7 @@ model Experience {
   profileId   String
   title       String
   company     String
+  companyId   String?
   companyLogo String?
   location    String?
   startDate   DateTime
@@ -123,9 +124,11 @@ model Experience {
   current     Boolean   @default(false)
   description String?   @db.Text
 
-  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile       Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  linkedCompany Company?  @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
   @@index([profileId])
+  @@index([companyId])
 }
 
 model Education {
@@ -425,9 +428,10 @@ model Company {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  members CompanyMember[]
-  invites CompanyInvite[]
-  posts   CompanyPost[]
+  members     CompanyMember[]
+  invites     CompanyInvite[]
+  posts       CompanyPost[]
+  experiences Experience[]
 
   @@index([slug])
   @@index([name])
