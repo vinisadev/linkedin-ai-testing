@@ -80,7 +80,7 @@ export function CurrentPositionStep() {
           >
             <Briefcase className="w-6 h-6 mx-auto mb-2 text-linkedin-blue" />
             <p className="text-sm font-medium text-linkedin-text-dark">
-              I'm currently working
+              I&apos;m currently working
             </p>
           </button>
           <button
@@ -93,7 +93,7 @@ export function CurrentPositionStep() {
           >
             <div className="w-6 h-6 mx-auto mb-2 rounded-full border-2 border-linkedin-text-gray" />
             <p className="text-sm font-medium text-linkedin-text-dark">
-              I'm not working right now
+              I&apos;m not working right now
             </p>
           </button>
         </div>

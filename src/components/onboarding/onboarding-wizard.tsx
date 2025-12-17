@@ -13,7 +13,7 @@ interface OnboardingWizardProps {
 }
 
 export function OnboardingWizard({ userName }: OnboardingWizardProps) {
-  const { currentStep, totalSteps } = useOnboardingStore();
+  const { currentStep } = useOnboardingStore();
 
   const steps = [
     { number: 1, title: "Basic Info" },
