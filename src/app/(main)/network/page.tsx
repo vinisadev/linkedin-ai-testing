@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Loader2, Users, UserPlus } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { Loader2, Users, UserPlus, UserCheck } from "lucide-react";
 import { UserCard } from "@/components/search/user-card";
+import { ConnectionsList } from "@/components/network/connections-list";
 
 interface SuggestedUser {
   id: string;
@@ -24,15 +25,25 @@ interface SuggestedUser {
   } | null;
 }
 
+interface Connection {
+  id: string;
+  status: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string | null;
+    image: string | null;
+    headline: string | null;
+  };
+}
+
 export default function NetworkPage() {
   const [suggestions, setSuggestions] = useState<SuggestedUser[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
+  const [isLoadingConnections, setIsLoadingConnections] = useState(true);
 
-  useEffect(() => {
-    fetchSuggestions();
-  }, []);
-
-  const fetchSuggestions = async () => {
+  const fetchSuggestions = useCallback(async () => {
     try {
       const response = await fetch("/api/search/suggestions");
       if (response.ok) {
@@ -42,8 +53,31 @@ export default function NetworkPage() {
     } catch (error) {
       console.error("Failed to fetch suggestions:", error);
     } finally {
-      setIsLoading(false);
+      setIsLoadingSuggestions(false);
     }
+  }, []);
+
+  const fetchConnections = useCallback(async () => {
+    try {
+      const response = await fetch("/api/connections?status=ACCEPTED");
+      if (response.ok) {
+        const data = await response.json();
+        setConnections(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch connections:", error);
+    } finally {
+      setIsLoadingConnections(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSuggestions();
+    fetchConnections();
+  }, [fetchSuggestions, fetchConnections]);
+
+  const handleRemoveConnection = (connectionId: string) => {
+    setConnections((prev) => prev.filter((c) => c.id !== connectionId));
   };
 
   return (
@@ -73,7 +107,7 @@ export default function NetworkPage() {
         </div>
 
         <div className="p-4">
-          {isLoading ? (
+          {isLoadingSuggestions ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-linkedin-blue" />
             </div>
@@ -93,6 +127,41 @@ export default function NetworkPage() {
                 Complete your profile to get personalized suggestions
               </p>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* My Connections */}
+      <div className="card">
+        <div className="p-4 border-b border-linkedin-border-gray">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <UserCheck className="w-5 h-5 text-linkedin-text-gray" />
+              <h2 className="font-semibold text-linkedin-text-dark">
+                Connections
+              </h2>
+              {!isLoadingConnections && (
+                <span className="text-sm text-linkedin-text-gray">
+                  ({connections.length})
+                </span>
+              )}
+            </div>
+          </div>
+          <p className="text-sm text-linkedin-text-gray mt-1">
+            People in your network
+          </p>
+        </div>
+
+        <div>
+          {isLoadingConnections ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-linkedin-blue" />
+            </div>
+          ) : (
+            <ConnectionsList
+              connections={connections}
+              onRemoveConnection={handleRemoveConnection}
+            />
           )}
         </div>
       </div>
