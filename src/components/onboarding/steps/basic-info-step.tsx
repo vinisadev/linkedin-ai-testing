@@ -44,7 +44,7 @@ export function BasicInfoStep({ userName }: BasicInfoStepProps) {
     <div className="max-w-lg mx-auto">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-semibold text-linkedin-text-dark mb-2">
-          Let's start with the basics
+          Let&apos;s start with the basics
         </h1>
         <p className="text-linkedin-text-gray">
           Help others get to know you better

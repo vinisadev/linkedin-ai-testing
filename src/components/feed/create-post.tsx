@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { Image, FileText, Calendar, Newspaper } from "lucide-react";
+import { Image as ImageIcon, Calendar, Newspaper } from "lucide-react";
 
 export function CreatePost() {
   const { data: session } = useSession();
@@ -18,7 +18,7 @@ export function CreatePost() {
       </div>
       <div className="flex items-center justify-around mt-4 pt-2">
         <button className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-linkedin-warm-gray text-linkedin-text-gray">
-          <Image className="w-5 h-5 text-linkedin-blue" />
+          <ImageIcon className="w-5 h-5 text-linkedin-blue" />
           <span className="text-sm font-medium">Media</span>
         </button>
         <button className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-linkedin-warm-gray text-linkedin-text-gray">
