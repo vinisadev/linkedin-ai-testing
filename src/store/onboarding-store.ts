@@ -36,10 +36,10 @@ interface OnboardingStore {
   currentStep: number;
   totalSteps: number;
   data: OnboardingData;
-  setStep: (step: number) => void;
+  setStep: (_step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
-  updateData: (data: Partial<OnboardingData>) => void;
+  updateData: (_data: Partial<OnboardingData>) => void;
   reset: () => void;
 }
 
