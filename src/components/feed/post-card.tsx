@@ -11,7 +11,7 @@ interface PostCardProps {
     author: {
       name: string;
       headline?: string;
-      image?: string;
+      image?: string | null;
     };
     _count: {
       likes: number;
@@ -25,8 +25,16 @@ export function PostCard({ post }: PostCardProps) {
     <article className="card">
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-full bg-linkedin-blue text-white text-lg flex items-center justify-center flex-shrink-0">
-            {post.author.name[0].toUpperCase()}
+          <div className="w-12 h-12 rounded-full bg-linkedin-blue text-white text-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+            {post.author.image ? (
+              <img
+                src={post.author.image}
+                alt={post.author.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              post.author.name[0].toUpperCase()
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-linkedin-text-dark">{post.author.name}</h3>

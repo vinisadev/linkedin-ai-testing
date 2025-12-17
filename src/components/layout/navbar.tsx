@@ -13,10 +13,12 @@ export function Navbar() {
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [userImage, setUserImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (session?.user) {
       fetchUnreadCount();
+      fetchUserImage();
       // Poll for new notifications every 30 seconds
       const interval = setInterval(fetchUnreadCount, 30000);
       return () => clearInterval(interval);
@@ -32,6 +34,18 @@ export function Navbar() {
       }
     } catch (error) {
       console.error("Failed to fetch unread count:", error);
+    }
+  };
+
+  const fetchUserImage = async () => {
+    try {
+      const response = await fetch("/api/users/me");
+      if (response.ok) {
+        const data = await response.json();
+        setUserImage(data.image);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user image:", error);
     }
   };
 
@@ -85,9 +99,9 @@ export function Navbar() {
             {session?.user && (
               <div className="relative group">
                 <button className="flex flex-col items-center text-linkedin-text-gray hover:text-linkedin-text-dark">
-                  {session.user.image ? (
+                  {userImage ? (
                     <img
-                      src={session.user.image}
+                      src={userImage}
                       alt={session.user.name || "Profile"}
                       className="w-6 h-6 rounded-full object-cover"
                     />
