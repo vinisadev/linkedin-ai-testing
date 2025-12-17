@@ -3,17 +3,25 @@
 import { useState, useEffect } from "react";
 import { Loader2, Trash2 } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
+import { CompanySelect } from "@/components/ui/company-select";
 
 interface Experience {
   id: string;
   title: string;
   company: string;
+  companyId: string | null;
   companyLogo: string | null;
   location: string | null;
   startDate: Date;
   endDate: Date | null;
   current: boolean;
   description: string | null;
+  linkedCompany?: {
+    id: string;
+    name: string;
+    slug: string;
+    logo: string | null;
+  } | null;
 }
 
 interface ExperienceModalProps {
@@ -34,6 +42,7 @@ export function ExperienceModal({
   const [formData, setFormData] = useState({
     title: "",
     company: "",
+    companyId: null as string | null,
     location: "",
     startDate: "",
     endDate: "",
@@ -46,6 +55,7 @@ export function ExperienceModal({
       setFormData({
         title: experience.title,
         company: experience.company,
+        companyId: experience.companyId,
         location: experience.location || "",
         startDate: new Date(experience.startDate).toISOString().split("T")[0],
         endDate: experience.endDate
@@ -58,6 +68,7 @@ export function ExperienceModal({
       setFormData({
         title: "",
         company: "",
+        companyId: null,
         location: "",
         startDate: "",
         endDate: "",
@@ -82,6 +93,7 @@ export function ExperienceModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          companyId: formData.companyId || null,
           endDate: formData.current ? undefined : formData.endDate || undefined,
         }),
       });
@@ -153,13 +165,13 @@ export function ExperienceModal({
           <label className="block text-sm font-medium text-linkedin-text-dark mb-1">
             Company *
           </label>
-          <input
-            type="text"
+          <CompanySelect
             value={formData.company}
-            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-            className="input"
-            placeholder="Ex: Google"
-            required
+            companyId={formData.companyId}
+            onChange={(company, companyId) =>
+              setFormData({ ...formData, company, companyId })
+            }
+            placeholder="Search for a company or type a name..."
           />
         </div>
 

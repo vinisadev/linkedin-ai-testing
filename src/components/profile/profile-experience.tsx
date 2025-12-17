@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Pencil, Plus, Briefcase } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { ExperienceModal } from "./experience-modal";
@@ -9,12 +10,19 @@ interface Experience {
   id: string;
   title: string;
   company: string;
+  companyId: string | null;
   companyLogo: string | null;
   location: string | null;
   startDate: Date;
   endDate: Date | null;
   current: boolean;
   description: string | null;
+  linkedCompany?: {
+    id: string;
+    name: string;
+    slug: string;
+    logo: string | null;
+  } | null;
 }
 
 interface ProfileExperienceProps {
@@ -102,7 +110,16 @@ export function ProfileExperience({ experiences, isOwnProfile, onUpdate }: Profi
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="font-semibold text-linkedin-text-dark">{exp.title}</h3>
-                      <p className="text-linkedin-text-dark">{exp.company}</p>
+                      {exp.linkedCompany ? (
+                        <Link
+                          href={`/company/${exp.linkedCompany.slug}`}
+                          className="text-linkedin-text-dark hover:text-linkedin-blue hover:underline"
+                        >
+                          {exp.company}
+                        </Link>
+                      ) : (
+                        <p className="text-linkedin-text-dark">{exp.company}</p>
+                      )}
                       <p className="text-sm text-linkedin-text-gray">
                         {formatDuration(exp.startDate, exp.endDate, exp.current)}
                       </p>

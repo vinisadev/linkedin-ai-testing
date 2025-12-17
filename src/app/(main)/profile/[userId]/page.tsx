@@ -32,6 +32,16 @@ async function getProfile(userId: string, currentUserId?: string) {
           about: true,
           experiences: {
             orderBy: { startDate: "desc" },
+            include: {
+              linkedCompany: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  logo: true,
+                },
+              },
+            },
           },
           educations: {
             orderBy: { startDate: "desc" },
